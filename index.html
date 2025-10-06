@@ -6,8 +6,7 @@
   <title>Geolonia Maps Workshop</title>
   <link rel="stylesheet" href="style.css" />
   <!-- Geolonia のスクリプト -->
-  <script src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=ec4ab98a033b4729ab4e90b46ae77bb5
-" defer></script>
+  <script src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=ec4ab98a033b4729ab4e90b46ae77bb5" defer></script>
 </head>
 <body>
   <h1>Geolonia Maps – 課題提出版</h1>
@@ -15,8 +14,8 @@
   <!-- 基本の地図コンテナ -->
   <div
     class="geolonia"
-    data-lat="34.342"   <!-- アイバル香川の緯度 -->
-    data-lng="134.046"  <!-- アイバル香川の経度 -->
+    data-lat="34.342"
+    data-lng="134.046"
     data-zoom="14"
     data-style="geolonia/basic"
     style="width:100%;height:60vh;"
@@ -29,19 +28,7 @@
     el.addEventListener('geolonia.load', async (e) => {
       const map = e.detail.map;
 
-      // =====================================================
-      // Step1: 単一マーカー（課題①）
-      // =====================================================
-      /*
-      new maplibregl.Marker()
-        .setLngLat([134.046, 34.342]) // アイバル香川
-        .setPopup(new maplibregl.Popup().setText('アイバル香川'))
-        .addTo(map);
-      */
-
-      // =====================================================
-      // Step2: GeoJSON 複数マーカー（今回は1件だけ）（課題②・③）
-      // =====================================================
+      // Step2: GeoJSON 複数マーカー（今回は1件だけ）
       const res = await fetch('./data.geojson');
       const geojson = await res.json();
 
