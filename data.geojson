@@ -1,0 +1,37 @@
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "東京駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.767125, 35.681236]  // 経度, 緯度
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "大阪駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [135.498302, 34.702485]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "札幌駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [141.350755, 43.068661]
+      }
+    }
+  ]
+}
+```
