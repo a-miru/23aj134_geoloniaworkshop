@@ -1,79 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Geolonia Maps 課題 完成版</title>
-
-  <!-- Geolonia スクリプト -->
+  <title>Geolonia Maps Workshop</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Geolonia のスクリプト -->
   <script src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=ec4ab98a033b4729ab4e90b46ae77bb5" defer></script>
-
-  <!-- MapLibre 用クラスタリング -->
-  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" />
-  <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
-
-  <style>
-    #map { width: 100%; height: 70vh; margin-bottom: 20px; }
-  </style>
 </head>
 <body>
-  <h1>Geolonia Maps – 課題 完成版</h1>
+  <h1>Geolonia Maps – Marker Workshop</h1>
 
-  <div id="map"></div>
+  <!-- 基本の地図コンテナ -->
+  <div
+    class="geolonia"
+    data-lat="34.342"
+    data-lng="134.046"
+    data-zoom="14"
+    data-style="geolonia/basic"
+    style="width:100%;height:60vh;"
+  ></div>
 
   <script>
-  document.addEventListener('DOMContentLoaded', async () => {
+  document.addEventListener('DOMContentLoaded', () => {
+    const el = document.querySelector('.geolonia');
 
-    // 1. 地図作成
-    const map = new geolonia.Map({
-      container: 'map',
-      center: [134.046, 34.342],
-      zoom: 6,
-      style: 'geolonia/basic'
+    el.addEventListener('geolonia.load', async (e) => {
+      const map = e.detail.map;
+
+      // Step2: GeoJSON 複数マーカー（今回は1件だけ）
+      const res = await fetch('./data.geojson');
+      const geojson = await res.json();
+
+      for (const f of geojson.features) {
+        const [lng, lat] = f.geometry.coordinates;
+        const { name, desc } = f.properties;
+
+        new maplibregl.Marker()
+          .setLngLat([lng, lat])
+          .setPopup(new maplibregl.Popup().setHTML(`<strong>${name}</strong><br>${desc}`))
+          .addTo(map);
+      }
+
+      // 1件だけでも fitBounds で中心に寄せる
+      const coords = geojson.features.map(f => f.geometry.coordinates);
+      const bounds = new maplibregl.LngLatBounds(coords[0], coords[0]);
+      map.fitBounds(bounds, { padding: 40, duration: 500 });
     });
-
-    // 2. 単一マーカー（例：東京）
-    new geolonia.Marker([139.6917, 35.6895])
-      .setPopup(new geolonia.Popup().setText('東京'))
-      .addTo(map);
-
-    // 3. GeoJSON 複数マーカー読み込み
-    const geojson = {
-      "type": "FeatureCollection",
-      "features": [
-        { "type": "Feature", "properties": { "name": "大阪", "desc": "大阪市" }, "geometry": { "type": "Point", "coordinates": [135.5023, 34.6937] } },
-        { "type": "Feature", "properties": { "name": "名古屋", "desc": "名古屋市" }, "geometry": { "type": "Point", "coordinates": [136.9066, 35.1815] } },
-        { "type": "Feature", "properties": { "name": "福岡", "desc": "福岡市" }, "geometry": { "type": "Point", "coordinates": [130.4017, 33.5902] } }
-      ]
-    };
-
-    // クラスタリング対応（MapLibre用）
-    const markers = [];
-    geojson.features.forEach(f => {
-      const [lng, lat] = f.geometry.coordinates;
-      const { name, desc } = f.properties;
-
-      // カスタムアイコン
-      const el = document.createElement('div');
-      el.className = 'marker';
-      el.style.backgroundImage = 'url(https://cdn-icons-png.flaticon.com/512/684/684908.png)';
-      el.style.width = '30px';
-      el.style.height = '30px';
-      el.style.backgroundSize = '100%';
-
-      const marker = new maplibregl.Marker(el)
-        .setLngLat([lng, lat])
-        .setPopup(new maplibregl.Popup().setHTML(`<strong>${name}</strong><br>${desc}`))
-        .addTo(map);
-
-      markers.push(marker);
-    });
-
-    // 中心調整
-    const coords = geojson.features.map(f => f.geometry.coordinates);
-    const bounds = coords.reduce((b, c) => b.extend(c), new maplibregl.LngLatBounds(coords[0], coords[0]));
-    map.fitBounds(bounds, { padding: 50, duration: 500 });
-
   });
   </script>
 </body>
