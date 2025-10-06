@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Geolonia Maps Workshop</title>
+  <title>Geolonia Maps Workshop – GeoJSON Marker</title>
   <link rel="stylesheet" href="style.css" />
   <!-- Geolonia のスクリプト -->
   <script src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=ec4ab98a033b4729ab4e90b46ae77bb5" defer></script>
@@ -28,23 +28,27 @@
     el.addEventListener('geolonia.load', async (e) => {
       const map = e.detail.map;
 
-      // Step2: GeoJSON 複数マーカー（今回は1件だけ）
-      const res = await fetch('./data.geojson');
+      // GeoJSON 複数マーカー読み込み
+      const res = await fetch('./data.geojson'); // data.geojson が同ディレクトリに必要
       const geojson = await res.json();
 
+      // 各点に Marker を置く
       for (const f of geojson.features) {
         const [lng, lat] = f.geometry.coordinates;
         const { name, desc } = f.properties;
 
         new maplibregl.Marker()
           .setLngLat([lng, lat])
-          .setPopup(new maplibregl.Popup().setHTML(`<strong>${name}</strong><br>${desc}`))
+          .setPopup(new maplibregl.Popup().setHTML(`<strong>${name}</strong><br>${desc ?? ''}`))
           .addTo(map);
       }
 
-      // 1件だけでも fitBounds で中心に寄せる
+      // 地図を全マーカーにフィット
       const coords = geojson.features.map(f => f.geometry.coordinates);
-      const bounds = new maplibregl.LngLatBounds(coords[0], coords[0]);
+      const bounds = coords.reduce(
+        (b, c) => b.extend(c),
+        new maplibregl.LngLatBounds(coords[0], coords[0])
+      );
       map.fitBounds(bounds, { padding: 40, duration: 500 });
     });
   });
