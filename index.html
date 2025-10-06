@@ -5,13 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Geolonia Maps Workshop – GeoJSON Marker</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- Geolonia のスクリプト -->
   <script src="https://cdn.geolonia.com/v1/embed?geolonia-api-key=ec4ab98a033b4729ab4e90b46ae77bb5" defer></script>
 </head>
 <body>
   <h1>Geolonia Maps – Marker Workshop</h1>
 
-  <!-- 基本の地図コンテナ -->
   <div
     class="geolonia"
     data-lat="34.342"
@@ -25,12 +23,27 @@
   document.addEventListener('DOMContentLoaded', () => {
     const el = document.querySelector('.geolonia');
 
-    el.addEventListener('geolonia.load', async (e) => {
+    el.addEventListener('geolonia.load', (e) => {
       const map = e.detail.map;
 
-      // GeoJSON 複数マーカー読み込み
-      const res = await fetch('./data.geojson'); // data.geojson が同ディレクトリに必要
-      const geojson = await res.json();
+      // 2つのGeoJSONをまとめて1つの配列に
+      const geojson = {
+        "type": "FeatureCollection",
+        "features": [
+          { "type": "Feature",
+            "properties": { "name": "アイバル香川", "desc": "香川県高松市" },
+            "geometry": { "type": "Point", "coordinates": [134.046, 34.342] }
+          },
+          { "type":"Feature",
+            "properties": { "name":"サンプル1", "desc":"説明1" },
+            "geometry": { "type":"Point", "coordinates":[134.046,34.342] }
+          },
+          { "type":"Feature",
+            "properties": { "name":"サンプル2", "desc":"説明2" },
+            "geometry": { "type":"Point", "coordinates":[134.060,34.350] }
+          }
+        ]
+      };
 
       // 各点に Marker を置く
       for (const f of geojson.features) {
